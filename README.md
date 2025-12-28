@@ -1,0 +1,222 @@
+# Kvasir Medical Image Segmentation
+
+A comprehensive medical image segmentation project implementing **UNet**, **TransUNet**, and **Ensemble Fusion** models for polyp detection and segmentation using the Kvasir-SEG dataset.
+
+## 🎯 Project Overview
+
+This project focuses on automated polyp segmentation in colonoscopy images, which is crucial for early detection and diagnosis of colorectal cancer. We implemented and compared three state-of-the-art deep learning architectures:
+
+1. **UNet** - Classic encoder-decoder architecture with skip connections
+2. **TransUNet** - Transformer-based encoder for better feature extraction
+3. **Ensemble Fusion** - Combined predictions from UNet and TransUNet for improved accuracy
+
+## 📊 Performance Results
+
+### Model Comparison on Kvasir-SEG Test Set
+
+| Model | IoU (Jaccard) | F1-Score (Dice) | Description |
+|-------|---------------|-----------------|-------------|
+| **UNet** | 81.38% | 89.73% | Using mit_b0 encoder with ImageNet pre-training |
+| **TransUNet** | 79.03% | 88.09% | Transformer-based encoder architecture |
+| **Ensemble Fusion** | **84.78%** | **90.18%** | Simple averaging of UNet + TransUNet outputs |
+
+### Additional Evaluation on Kvasir-Sessile Dataset
+
+The ensemble model was also tested on the Kvasir-Sessile dataset (sessile polyp subset) to evaluate generalization performance.
+
+## 🏗️ Architecture Details
+
+### UNet
+- **Encoder**: MiT-B0 (Mix Transformer) with ImageNet pre-training
+- **Framework**: segmentation-models-pytorch (smp)
+- **Loss Function**: Dice Loss
+- **Optimizer**: Adam
+- **Image Size**: 256x256
+
+### TransUNet
+- **Encoder**: Transformer-based encoder
+- **Framework**: segmentation-models-pytorch (smp.Unet)
+- **Loss Function**: Dice Loss
+- **Optimizer**: Adam
+- **Image Size**: 256x256
+
+### Ensemble Fusion
+- **Method**: Simple averaging of predictions
+- **Formula**: `(output_unet + output_transunet) / 2`
+- **Threshold**: 0.5 for binary segmentation
+
+## 📁 Project Structure
+
+```
+kvasir-medical-segmentation/
+├── README.md                          # Project documentation
+├── requirements.txt                   # Python dependencies
+├── .gitignore                         # Git ignore rules
+├── notebooks/
+│   └── Kvasir.ipynb                  # Main training and evaluation notebook
+├── models/
+│   ├── unet_fixed_split_best_weights.pth      # Trained UNet weights
+│   └── transunet_fixed_split_best_weights.pth # Trained TransUNet weights
+└── results/
+    └── performance_metrics.md         # Detailed performance analysis
+```
+
+## 🔧 Installation
+
+### Prerequisites
+- Python 3.8+
+- CUDA-capable GPU (recommended for training)
+- Google Colab account (if running in cloud)
+
+### Setup
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yusufsakirri1/kvasir-medical-segmentation.git
+cd kvasir-medical-segmentation
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Download the Kvasir-SEG dataset:
+   - Visit: https://datasets.simula.no/kvasir-seg/
+   - Extract to your preferred location
+   - Update dataset paths in the notebook
+
+## 🚀 Usage
+
+### Training
+
+Open `notebooks/Kvasir.ipynb` in Jupyter or Google Colab and follow these steps:
+
+1. **Setup Environment**: Install required libraries
+2. **Mount Google Drive**: (If using Colab) to access datasets
+3. **Configure Paths**: Update dataset base path
+4. **Train UNet**: Run UNet training cells
+5. **Train TransUNet**: Run TransUNet training cells
+6. **Evaluate Ensemble**: Run ensemble evaluation cells
+
+### Inference
+
+To use pre-trained models for inference:
+
+```python
+import torch
+import segmentation_models_pytorch as smp
+
+# Load UNet model
+model_unet = smp.Unet(
+    encoder_name='mit_b0',
+    encoder_weights='imagenet',
+    in_channels=3,
+    classes=1
+)
+model_unet.load_state_dict(torch.load('models/unet_fixed_split_best_weights.pth'))
+model_unet.eval()
+
+# Load TransUNet model
+model_transunet = smp.Unet(
+    encoder_name='transformer-based-encoder',  # Adjust based on your config
+    in_channels=3,
+    classes=1
+)
+model_transunet.load_state_dict(torch.load('models/transunet_fixed_split_best_weights.pth'))
+model_transunet.eval()
+
+# Ensemble prediction
+with torch.no_grad():
+    output_unet = model_unet(image)
+    output_transunet = model_transunet(image)
+    ensemble_output = (output_unet + output_transunet) / 2
+    prediction = (ensemble_output > 0.5).float()
+```
+
+## 📊 Dataset
+
+### Kvasir-SEG
+- **Description**: Gastrointestinal polyp segmentation dataset
+- **Images**: 1000 polyp images with corresponding masks
+- **Resolution**: Various (resized to 256x256 for training)
+- **Split**: 80% training, 20% validation
+- **Source**: https://datasets.simula.no/kvasir-seg/
+
+### Kvasir-Sessile
+- **Description**: Subset focusing on sessile polyps
+- **Usage**: Additional testing and validation
+- **Purpose**: Evaluate model generalization
+
+## 🧪 Training Configuration
+
+- **Image Size**: 256x256 pixels
+- **Batch Size**: Configurable (typically 8-16)
+- **Learning Rate**: 0.0001 (Adam optimizer)
+- **Loss Function**: Dice Loss
+- **Metrics**: IoU (Jaccard Index), F1-Score (Dice Coefficient), Accuracy
+- **Data Augmentation**: Albumentations library
+  - Horizontal/Vertical Flip
+  - Rotation
+  - Random brightness/contrast
+  - Elastic transform
+
+## 📈 Experiment Tracking
+
+This project uses **Weights & Biases (wandb)** for experiment tracking:
+- Training/validation loss curves
+- Metric evolution over epochs
+- Model performance comparison
+- Hyperparameter logging
+
+## 🔬 Key Features
+
+- **Multiple Architectures**: Comparison of UNet, TransUNet, and Ensemble approaches
+- **Transfer Learning**: ImageNet pre-trained encoders for better initialization
+- **Data Augmentation**: Robust augmentation pipeline using Albumentations
+- **Ensemble Learning**: Improved performance through model combination
+- **Comprehensive Metrics**: IoU, F1-Score, and Accuracy evaluation
+- **Visualization**: Prediction visualization with ground truth comparison
+
+## 📝 Citation
+
+If you use this code or the Kvasir-SEG dataset, please cite:
+
+```bibtex
+@inproceedings{jha2020kvasir,
+  title={Kvasir-seg: A segmented polyp dataset},
+  author={Jha, Debesh and Smedsrud, Pia H and Riegler, Michael A and Halvorsen, P{\aa}l and de Lange, Thomas and Johansen, Dag and Johansen, H{\aa}vard D},
+  booktitle={International Conference on Multimedia Modeling},
+  pages={451--462},
+  year={2020},
+  organization={Springer}
+}
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 👤 Author
+
+**Yusuf Sakirri**
+- GitHub: [@yusufsakirri1](https://github.com/yusufsakirri1)
+
+## 🙏 Acknowledgments
+
+- **Kvasir-SEG Dataset**: Simula Research Laboratory
+- **segmentation-models-pytorch**: Pavel Yakubovskiy
+- **PyTorch Team**: For the excellent deep learning framework
+- **Google Colab**: For providing free GPU resources
+
+## 📧 Contact
+
+For questions or collaborations, please open an issue or reach out via GitHub.
+
+---
+
+**Note**: Model weight files (`.pth`) are not included in this repository due to file size constraints. They can be downloaded from [releases](https://github.com/yusufsakirri1/kvasir-medical-segmentation/releases) or regenerated by running the training notebook.
