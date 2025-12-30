@@ -198,29 +198,6 @@ This project uses **Weights & Biases (wandb)** for experiment tracking:
 - **Comprehensive Metrics**: IoU, F1-Score, and Accuracy evaluation
 - **Visualization**: Prediction visualization with ground truth comparison
 
-## 📝 Citation
-
-If you use this code or the Kvasir-SEG dataset, please cite:
-
-```bibtex
-@inproceedings{jha2020kvasir,
-  title={Kvasir-seg: A segmented polyp dataset},
-  author={Jha, Debesh and Smedsrud, Pia H and Riegler, Michael A and Halvorsen, P{\aa}l and de Lange, Thomas and Johansen, Dag and Johansen, H{\aa}vard D},
-  booktitle={International Conference on Multimedia Modeling},
-  pages={451--462},
-  year={2020},
-  organization={Springer}
-}
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
 ## 👤 Author
 
 **Yusuf Sakirri**
