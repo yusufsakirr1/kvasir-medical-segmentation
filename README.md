@@ -102,7 +102,7 @@ pip install -r requirements.txt
 ```
 
 3. Download the Kvasir-SEG dataset:
-   - Visit: https://datasets.simula.no/kvasir-seg/
+   - Visit: https://www.kaggle.com/datasets/dankok/kvasir-seg
    - Extract to your preferred location
    - Update dataset paths in the notebook
 
@@ -161,7 +161,7 @@ with torch.no_grad():
 - **Images**: 1000 polyp images with corresponding masks
 - **Resolution**: Various (resized to 256x256 for training)
 - **Split**: 80% training, 20% validation
-- **Source**: https://datasets.simula.no/kvasir-seg/
+- **Source**: https://www.kaggle.com/datasets/dankok/kvasir-seg
 
 ### Kvasir-Sessile
 - **Description**: Subset focusing on sessile polyps
